@@ -13,6 +13,7 @@ import Permisos from './routes/privilegios/permisos'
 import Roles from './routes/privilegios/roles'
 import De_permisos from './routes/privilegios/de_permisos'
 import Usuarios from './routes/privilegios/usuarios'
+import Citas from './routes/clinica/citas'
 
 // APP CON EXPRESS
 const app = express()
@@ -29,7 +30,8 @@ app.use('/api', subUnidad);
 app.use('/api', Roles);
 app.use('/api', Permisos);
 app.use('/api', De_permisos);
-app.use('/api/auth', Usuarios)
+app.use('/api/auth', Usuarios);
+app.use('/api', Citas);
 
 //app.use('/api' )
 

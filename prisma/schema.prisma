@@ -13,54 +13,65 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// USUARIO ADMINIDTRADOR
-model User {
-  id Int  @id @default(autoincrement())
-  usuario String @unique
-  password String
+model Doctor {
+  id        Int       @id @default(autoincrement())
+  name      String
+  specialty String
+  phone     String
+  email     String @unique
+  schedules Schedule[]
+  appointments Appointment[]
 }
 
-// TABLA DE ROLES
-model Roles {
-  id_rol Int @id @default(autoincrement())
-  n_rol String
-  abrev String
-  deta_perm De_permiso[]
-  usuarios Usuario[]
+model Patient {
+  id        Int       @id @default(autoincrement())
+  name      String
+  dob       DateTime // Fecha de nacimiento
+  phone     String
+  email     String @unique
+  address   String
+  appointments Appointment[]
+  payments  Payment[]
 }
 
-model Permisos {
-  id_per Int @id @default(autoincrement())
-  n_per String
-  abrev String?
-  DetaPerm De_permiso[]
+model Appointment {
+  id          Int       @id @default(autoincrement())
+  date        DateTime
+  status      String // Pendiente, Confirmada, Cancelada
+  doctor      Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId    Int
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  patientId   Int
+  service     Service  @relation(fields: [serviceId], references: [id])
+  serviceId   Int
+  payment     Payment?
 }
 
-model De_permiso {
-  id_Dper Int @id @default(autoincrement())
-  id_rol Int 
-  id_per Int
-  estado Boolean 
-  permisos Permisos @relation(fields: [id_per], references: [id_per])
-  roles Roles @relation(fields: [id_rol], references: [id_rol])
+model Schedule {
+  id         Int       @id @default(autoincrement())
+  dayOfWeek  String    // Ejemplo: Lunes, Martes...
+  startTime  String    // Ejemplo: "09:00"
+  endTime    String    // Ejemplo: "17:00"
+  doctor     Doctor    @relation(fields: [doctorId], references: [id])
+  doctorId   Int
 }
 
-model Usuario {
-  dni       String @db.Char(8)
-  n_usu     String  
-  estado    Boolean @default(true)
-  password  String
-  rol_id    Int   
-  id_sub    Int   
-  @@id([dni, rol_id, id_sub]) // Clave primaria compuesta
-  @@unique([dni, rol_id, id_sub])  // Unicidad en la combinación
-  rol       Roles   @relation(fields: [rol_id], references: [id_rol])
-  sub_uni   Oficina @relation(fields: [id_sub], references: [id_subUni])
+model Payment {
+  id            Int       @id @default(autoincrement())
+  amount        Float
+  method        String    // Efectivo, Tarjeta, Transferencia
+  date          DateTime
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId Int       @unique
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  patientId     Int
 }
 
-model Oficina {
-  id_subUni Int @id @default(autoincrement())
-  n_subUni  String
-  abrev     String
-  usuar     Usuario []
+
+model Service {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  appointments Appointment[]
 }
